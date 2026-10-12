@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro'
+import Board from './Board.astro'
+import { t, href, dateFormat, type Lang } from '../i18n'
+import { getReleases, RELEASES_URL } from '../lib/releases'
+import { inlineCode, formatSize } from '../lib/text'
+
+interface Props { lang: Lang }
+const { lang } = Astro.props
+const d = t(lang)
+const latest = (await getReleases())[0]
+const downloadUrl = latest?.installerUrl ?? `${RELEASES_URL}/latest`
+const downloadLabel = `${d.nav.download}${latest ? ` ${latest.version}` : ''}`
+
+// Full class strings so Tailwind can see them.
+const bars = ['border-todo', 'border-doing', 'border-review', 'border-valid', 'border-done']
+
+const tree = `.rohfa/
+  board.json
+  project.json
+  tasks/<uuid>.md
+  epics/<uuid>.md
+  releases/<uuid>.md
+  notes/<uuid>.md
+  chats/<uuid>.json`
+const btn = 'inline-flex items-center rounded-lg bg-cobalt px-5 py-3 font-semibold text-white hover:bg-cobalt-deep'
+---
+
+<Base lang={lang} page="home" title={d.hero.title}>
+  <div class="mx-auto max-w-6xl px-5">
+    <section class="pt-16 pb-14 md:pt-24">
+      <h1 class="max-w-4xl font-display text-5xl font-extrabold leading-[0.98] tracking-tight text-balance md:text-7xl">{d.hero.title}</h1>
+      <p class="mt-6 max-w-xl text-lg text-ink-soft">{d.hero.lead}</p>
+      <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <a class={btn} href={downloadUrl}>{downloadLabel}</a>
+        <a class="font-semibold underline decoration-line decoration-2 underline-offset-[6px] hover:decoration-ink" href={href(lang, 'changelog')}>{d.hero.all}</a>
+      </div>
+      <p class="mt-4 text-sm text-ink-soft">
+        {latest?.installerSize ? `${d.hero.size}, ${formatSize(latest.installerSize)}, ${dateFormat(lang, latest.date)}. ` : ''}{d.hero.needs}
+      </p>
+    </section>
+
+    <Board lang={lang} />
+
+    <section class="pt-28">
+      <h2 class="font-display text-3xl font-extrabold tracking-tight md:text-4xl">{d.steps.title}</h2>
+      <p class="mt-2 max-w-xl text-ink-soft">{d.steps.lead}</p>
+      <ol class="mt-8 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-5">
+        {d.steps.items.map(([name, text], i) => (
+          <li class={`border-t-4 pt-3 ${bars[i]}`}>
+            <h3 class="font-display text-lg font-bold">{name}</h3>
+            <p class="mt-1 text-[0.95rem] text-ink-soft">{text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section id="features" class="pt-28">
+      <h2 class="font-display text-3xl font-extrabold tracking-tight md:text-4xl">{d.features.title}</h2>
+      <div class="mt-8">
+        {d.features.items.map((f) => (
+          <div class="grid gap-1 border-t border-line py-6 md:grid-cols-[16rem_1fr] md:gap-10">
+            <h3 class="font-display text-xl font-bold">{f.title}</h3>
+            <p class="max-w-2xl text-ink-soft">{f.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="grid gap-10 pt-24 md:grid-cols-[1fr_20rem] md:items-start">
+      <div>
+        <h2 class="font-display text-3xl font-extrabold tracking-tight md:text-4xl">{d.files.title}</h2>
+        <p class="mt-3 max-w-xl text-ink-soft [&_code]:rounded [&_code]:bg-wash [&_code]:px-1.5 [&_code]:font-mono [&_code]:text-[0.85em] [&_code]:text-ink" set:html={inlineCode(d.files.lead)} />
+      </div>
+      <pre class="overflow-x-auto rounded-xl border border-line bg-wash p-5 font-mono text-[0.8rem] leading-relaxed">{tree}</pre>
+    </section>
+
+    <section class="pt-24">
+      <h2 class="font-display text-3xl font-extrabold tracking-tight md:text-4xl">{d.requirements.title}</h2>
+      <dl class="mt-8 grid gap-x-10 gap-y-6 md:grid-cols-3">
+        {d.requirements.items.map(([name, text]) => (
+          <div class="border-t border-line pt-4">
+            <dt class="font-display text-xl font-bold">{name}</dt>
+            <dd class="mt-1 text-ink-soft [&_code]:rounded [&_code]:bg-wash [&_code]:px-1.5 [&_code]:font-mono [&_code]:text-[0.85em] [&_code]:text-ink" set:html={inlineCode(text)} />
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section class="mt-28 rounded-2xl bg-cobalt px-6 py-12 text-white md:px-12">
+      <h2 class="font-display text-3xl font-extrabold tracking-tight md:text-5xl">{d.cta.title}</h2>
+      <p class="mt-3 max-w-lg text-white/85">{d.cta.text}</p>
+      <a class="mt-8 inline-flex items-center rounded-lg bg-white px-5 py-3 font-semibold text-cobalt-deep hover:bg-wash" href={downloadUrl}>{downloadLabel}</a>
+    </section>
+  </div>
+</Base>

@@ -1,0 +1,84 @@
+---
+/**
+ * Illustration of the app: a board next to the Markdown file behind one of its cards.
+ * The content is an example, not a screenshot.
+ */
+import { t, type Lang } from '../i18n'
+import { taskExample } from '../i18n/fr'
+
+interface Props { lang: Lang }
+const { lang } = Astro.props
+const d = t(lang)
+
+// Full class strings so Tailwind can see them.
+const tone = [
+  { bar: 'bg-todo', text: 'text-todo' },
+  { bar: 'bg-doing', text: 'text-doing' },
+  { bar: 'bg-review', text: 'text-review' },
+  { bar: 'bg-valid', text: 'text-valid' },
+  { bar: 'bg-done', text: 'text-done' },
+]
+
+type Card = { n: string; type: string; title: string; live?: boolean }
+const cards: Record<Lang, Card[][]> = {
+  fr: [
+    [{ n: '072', type: 'docs', title: 'Documenter le format des notes' }, { n: '073', type: 'fix', title: 'Corriger le tri des tâches' }],
+    [{ n: '069', type: 'docs', title: 'Ajouter un README', live: true }],
+    [{ n: '068', type: 'feat', title: 'Filtrer le tableau par epic' }],
+    [{ n: '066', type: 'fix', title: 'Corriger l’aperçu des images' }],
+    [{ n: '064', type: 'feat', title: 'Ouvrir plusieurs projets' }],
+  ],
+  en: [
+    [{ n: '072', type: 'docs', title: 'Document the note format' }, { n: '073', type: 'fix', title: 'Fix task sorting' }],
+    [{ n: '069', type: 'docs', title: 'Add a readme', live: true }],
+    [{ n: '068', type: 'feat', title: 'Filter the board by epic' }],
+    [{ n: '066', type: 'fix', title: 'Fix image preview' }],
+    [{ n: '064', type: 'feat', title: 'Open several projects' }],
+  ],
+}
+
+// Frontmatter lines get a key/value split; the description line stays plain.
+const lines = taskExample.split('\n')
+const sep = lines.findIndex((l, i) => i > 0 && l === '---')
+---
+
+<div class="grid grid-cols-[minmax(0,1fr)] overflow-hidden rounded-2xl border border-line bg-white shadow-[0_24px_60px_-30px_rgba(20,33,61,0.45)] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+  <div class="overflow-x-auto bg-wash/60 p-4" role="img" aria-label={d.steps.lead}>
+    <div class="grid min-w-[40rem] grid-cols-5 gap-3">
+      {d.steps.items.map(([name], i) => (
+        <div>
+          <div class="mb-2 flex items-center gap-2 text-[0.8rem] font-semibold text-ink">
+            <span class={`h-2.5 w-2.5 rounded-full ${tone[i].bar}`}></span>{name}
+          </div>
+          <div class="flex flex-col gap-2">
+            {cards[lang][i].map((c) => (
+              <div class={`rounded-lg border bg-white p-2.5 text-[0.8rem] leading-snug ${c.live ? 'border-cobalt ring-2 ring-cobalt/25' : 'border-line'}`}>
+                <div class="mb-1 flex items-center justify-between text-[0.7rem] text-ink-soft">
+                  <span>#{c.n}</span><span>{c.type}</span>
+                </div>
+                <div class="font-medium">{c.title}</div>
+                {c.live && (
+                  <div class="mt-2 flex items-center gap-1.5 text-[0.7rem] text-doing">
+                    <span class="h-1.5 w-1.5 rounded-full bg-doing motion-safe:animate-pulse"></span><span class="text-ink-soft">{lang === 'fr' ? 'Agent en cours' : 'Agent running'}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <div class="bg-ink p-5 font-mono text-[0.8rem] leading-relaxed text-[#dbe3f5]">
+    <div class="mb-3 truncate text-[0.72rem] text-[#8c9bbd]">.rohfa/tasks/7c1e…4b2a.md</div>
+    <div class="overflow-x-auto whitespace-pre">{lines.map((l, i) => {
+      const inFront = i <= sep
+      const m = inFront && l.match(/^([a-zA-Z]+): (.*)$/)
+      return (
+        <div class={i === 0 || i === sep ? 'text-[#8c9bbd]' : ''}>
+          {m ? <><span class="text-[#8fb0ff]">{m[1]}</span>: <span>{m[2]}</span></> : l}
+        </div>
+      )
+    })}</div>
+  </div>
+</div>
