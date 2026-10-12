@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-paper: #fbfcfd;
+  --color-wash: #f1f4f8;
+  --color-ink: #14213d;
+  --color-ink-soft: #4a5670;
+  --color-line: #dde2ea;
+  --color-cobalt: #2f4bff;
+  --color-cobalt-deep: #2038d6;
+
+  /* The five board columns: the only multi-hue palette on the site, always meaning "this status". */
+  --color-todo: #8a94a8;
+  --color-doing: #e8a317;
+  --color-review: #8b5cf6;
+  --color-valid: #0e9f9a;
+  --color-done: #2e9e5b;
+
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Figtree', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, Menlo, monospace;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  body { @apply bg-paper font-sans text-ink antialiased; font-size: 1.0625rem; line-height: 1.65; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-cobalt rounded-sm; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+}
+
+/* Long-form HTML coming from the dictionaries and release notes. */
+.prose { --tw-prose-body: var(--color-ink); --tw-prose-headings: var(--color-ink); --tw-prose-links: var(--color-cobalt-deep); --tw-prose-bold: var(--color-ink); --tw-prose-bullets: var(--color-todo); --tw-prose-hr: var(--color-line); max-width: none; }
+.prose h2, .prose h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
+.prose code::before, .prose code::after { content: none; }
+.prose :not(pre) > code { background: var(--color-wash); border-radius: 4px; padding: 0.15em 0.4em; font-weight: 500; font-size: 0.875em; }
+.prose pre { background: var(--color-ink); color: #dbe3f5; border-radius: 0.75rem; font-size: 0.85rem; }
