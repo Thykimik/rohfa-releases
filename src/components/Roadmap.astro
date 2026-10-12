@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro'
+import { t, type Lang } from '../i18n'
+
+interface Props { lang: Lang }
+const { lang } = Astro.props
+const d = t(lang)
+
+// Same colors as the board columns: work in progress is amber, anything not started is grey.
+const tones: Record<string, string> = { doing: 'bg-doing', todo: 'bg-todo' }
+---
+
+<Base lang={lang} page="roadmap" title={d.roadmap.title} description={d.roadmap.lead}>
+  <div class="mx-auto max-w-6xl px-5">
+    <div class="pt-14 pb-6 md:pt-20">
+      <h1 class="font-display text-4xl font-extrabold tracking-tight md:text-6xl">{d.roadmap.title}</h1>
+      <p class="mt-4 max-w-xl text-lg text-ink-soft">{d.roadmap.lead}</p>
+    </div>
+    {d.roadmap.groups.map((g) => (
+      <section class="grid gap-4 border-t border-line py-10 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10">
+        <header>
+          <h2 class="flex items-center gap-2 font-display text-2xl font-extrabold tracking-tight">
+            <span class={`h-3 w-3 rounded-full ${tones[g.tone]}`}></span>{g.name}
+          </h2>
+          <p class="mt-2 text-sm text-ink-soft">{g.text}</p>
+        </header>
+        <ul class="flex max-w-3xl flex-col gap-7">
+          {g.items.map((i) => (
+            <li>
+              <h3 class="font-display text-xl font-bold">{i.title}</h3>
+              <p class="mt-1 text-ink-soft">{i.text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+      </div>
+</Base>
