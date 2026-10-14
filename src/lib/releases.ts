@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import translations from '../data/changelog-en.json'
+import translations from '../data/changelog-fr.json'
 
 const REPO = 'Thykimik/rohfa-releases'
 export const RELEASES_URL = `https://github.com/${REPO}/releases`
@@ -8,7 +8,7 @@ export interface Release {
   version: string
   date: string
   url: string
-  /** Rendered notes per language; the source notes are French. */
+  /** Rendered notes per language; the source notes are English. */
   html: { fr: string; en: string }
   installerUrl: string | null
   installerSize: number | null
@@ -38,13 +38,13 @@ const cleanNotes = (body: string) =>
 const unlinkPrivateRepo = (html: string) =>
   html.replace(/<a href="https:\/\/github\.com\/Thykimik\/rohfa-app\/[^"]*">([^<]*)<\/a>/g, '$1')
 
-/** Release notes are French; bullets listed in src/data/changelog-en.json get their English text, others stay French. */
-function toEnglish(markdown: string, version: string): string {
+/** Release notes are English; bullets listed in src/data/changelog-fr.json get their French text, others stay English. */
+function toFrench(markdown: string, version: string): string {
   const dict = translations as Record<string, string>
   return markdown.replace(/^(\* )(.+)$/gm, (line, bullet: string, text: string) => {
-    const en = dict[text.trim()]
-    if (!en) console.warn(`[changelog] ${version}: no English translation for "${text.trim()}"`)
-    return en ? bullet + en : line
+    const fr = dict[text.trim()]
+    if (!fr) console.warn(`[changelog] ${version}: no French translation for "${text.trim()}"`)
+    return fr ? bullet + fr : line
   })
 }
 
@@ -70,7 +70,7 @@ async function load(): Promise<Release[]> {
         version,
         date: r.published_at,
         url: r.html_url,
-        html: { fr: render(notes), en: render(toEnglish(notes, version)) },
+        html: { fr: render(toFrench(notes, version)), en: render(notes) },
         installerUrl: installer?.browser_download_url ?? null,
         installerSize: installer?.size ?? null,
       }
